@@ -218,10 +218,10 @@ python ce/src/policy_sweep_lgbm_cat.py \
 
 ## Design choices & trade-offs
 
-- **No feature store (for now).** Portfolio project on free tier; dbt + BigQuery are sufficient & reproducible. Easy to upgrade to Feast later.
-- **Native categoricals > one-hot.** Avoids memory blow-ups on ~30M rows; faster and typically as accurate for tree models.
-- **Unit-sales target.** Keeps policy simple and direct: revenue = price × predicted units.
-- **Explainable policy.** Fixed discount grid + argmax revenue per item/day; easy to review and constrain.
+- **No feature store (for now).** dbt + BigQuery are sufficient & reproducible. Easy to upgrade to Feast later.
+- **Native categoricals > one-hot.** Avoids memory blow-ups on ~30M rows. Its faster and typically as accurate for tree models.
+- **Unit-sales target.** To keep policy simple and direct, revenue = price × predicted units.
+- **Explainable policy.** Fixed discount grid + argmax revenue per item/day which makes it easy to review and constrain.
 
 ---
 
