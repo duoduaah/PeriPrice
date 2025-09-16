@@ -41,7 +41,12 @@
 > Prices aren’t provided. I introduce **realistic base price bands by family** and a **time-to-expiry proxy** to simulate markdown behavior. These are parameterized and documented so they can be replaced with enterprise data later.
 
 ---
+## Architecture (at a glance)
+- **End-to-end Flow (High Level)**
+![End-to-end Flow (High Level)](docs/img/end_to_end.png)
 
+
+---
 ## What I did (data engineering → features)
 
 ### GCS & Raw Zone
@@ -136,6 +141,7 @@ For each **(date, store, item)** in test:
 - **Cardinality:** `950` unique items, `54` unique stores (test)
 - **Compute:** BQML; CE **e2-standard-8 (8 vCPU, 32 GB)**; XGB/LGBM with native categoricals & histogram trees.
 
+---
 
 ## How to reproduce
 
@@ -208,6 +214,7 @@ python ce/src/policy_sweep_lgbm_cat.py \
   --write_bq --bq_table dynamic_pricing_ml.lgbm_policy_eval_test
 ```
 
+---
 
 ## Design choices & trade-offs
 
@@ -215,6 +222,8 @@ python ce/src/policy_sweep_lgbm_cat.py \
 - **Native categoricals > one-hot.** Avoids memory blow-ups on ~30M rows; faster and typically as accurate for tree models.
 - **Unit-sales target.** Keeps policy simple and direct: revenue = price × predicted units.
 - **Explainable policy.** Fixed discount grid + argmax revenue per item/day; easy to review and constrain.
+
+---
 
 ## What’s next (roadmap)
 
@@ -231,3 +240,4 @@ python ce/src/policy_sweep_lgbm_cat.py \
 
 ### Long-term
 -  **Cold-start** for new items/stores
+
