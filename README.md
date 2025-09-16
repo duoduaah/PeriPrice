@@ -5,7 +5,7 @@
 ---
 
 ## Table of Contents
-- [Why this project (problem & motivation)](#why-this-project-problem--motivation)
+- [Why this project ](#why-this-project-problem--motivation)
 - [Data](#data)
 - [What I did (data engineering → features)](#what-i-did-data-engineering--features)
 - [Modeling](#modeling)
@@ -17,18 +17,17 @@
 - [How to reproduce](#how-to-reproduce)
 - [Design choices & trade-offs](#design-choices--trade-offs)
 - [What’s next (roadmap)](#whats-next-roadmap)
-- [Project structure](#project-structure)
-- [License & contact](#license--contact)
+
 
 ---
 
 ## Why this project (problem & motivation)
 
-**Problem.** Perishable items lose value quickly. Static or ad-hoc markdowns either waste margin (too steep, too early) or miss sales (too late, too small), leading to **revenue loss and food waste**.
+**Problem:** Perishable items lose value quickly. Static or ad-hoc markdowns either waste margin (too steep, too early) or miss sales (too late, too small), leading to **revenue loss and food waste**.
 
-**Goal.** Learn a **data-driven pricing policy** that adapts discounts based on **expected demand** and **time-to-expiry**, maximizing near-term revenue while moving inventory at the right pace.
+**Goal:** Learn a **data-driven pricing policy** that adapts discounts based on **expected demand** and **time-to-expiry**, maximizing near-term revenue while moving inventory at the right pace.
 
-**Inspiration.** Mirrors what a Flashfood-style marketplace cares about: **reduce waste, increase sell-through, keep pricing explainable**.
+**Inspiration:** Mirrors what a Flashfood-style marketplace cares about: **reduce waste, increase sell-through, keep pricing explainable**.
 
 ---
 
@@ -49,7 +48,7 @@
 - Buckets: **`ff-landing`**, **`ff-raw`** with lifecycle rules + versioning.  
 - Ingestion: uploaded Kaggle CSVs to `landing/`, then organized into `raw/` (e.g., `sales/`, `transactions/`, `oil_prices/`).
 - External tables: **BigQuery external tables** over `ff-raw` for early SQL exploration.
-- Exploration: quick 2k-row samples to Pandas for EDA.
+
 
 ### Curated Zone (BigQuery native) & dbt
 - Migrated external → **native** BQ tables (6 sources).  
