@@ -1,0 +1,32 @@
+# -- credentials & env --
+.env
+.perienv
+
+# -- data & artifacts --
+data/**
+artifacts/**
+ce/mlruns/**
+
+
+
+# -- dbt related ---
+dbt_packages/**
+dbt/dbt_packages/**
+dbt/target/**
+dbt/logs/**
+dbt/macros/**
+
+# -- model artifacts / experiments ---
+logs/**
+outputs/**
+
+
+# --- notebooks & caches ---
+notebooks/eda.ipynb
+notebooks/real.ipynb
+.ipynb_checkpoints/
+__pycache__/
+*.pyc
+
+# --- OS/editor junk ---
+.DS_Store

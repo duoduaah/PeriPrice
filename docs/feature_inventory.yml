@@ -1,0 +1,197 @@
+# Feature Inventory for periprice (stage: marts v1 – no holidays, no transactions)
+# Grain of the main fact: (date, store_nbr, item_nbr)
+
+features:
+
+  # ---------- Target & sales-derived ----------
+  - name: unit_sales
+    source_model: fct_sales_features
+    keys: [date, store_nbr, item_nbr]
+    timestamp: date
+    type: numeric
+    definition: "Cleaned target; negatives clipped to 0; extreme spikes capped at 200."
+    leakage_safe: true
+    in_use: true
+
+  - name: log_sales
+    source_model: fct_sales_features
+    keys: [date, store_nbr, item_nbr]
+    timestamp: date
+    type: numeric
+    definition: "log(unit_sales + 1) computed after cleaning."
+    leakage_safe: true
+    in_use: true
+
+  - name: onpromotion
+    source_model: fct_sales_features
+    keys: [date, store_nbr, item_nbr]
+    timestamp: date
+    type: boolean
+    definition: "Promotion flag coerced to BOOL; NULLs → FALSE upstream."
+    leakage_safe: true
+    in_use: true
+
+  # ---------- Calendar (same-day; deterministic) ----------
+  - name: dow
+    source_model: fct_sales_features
+    keys: [date, store_nbr, item_nbr]
+    timestamp: date
+    type: categorical
+    definition: "Day of week extracted from date (1=Sunday in BigQuery)."
+    leakage_safe: true
+    in_use: true
+
+  - name: month
+    source_model: fct_sales_features
+    keys: [date, store_nbr, item_nbr]
+    timestamp: date
+    type: categorical
+    definition: "Month number extracted from date."
+    leakage_safe: true
+    in_use: true
+
+  - name: year
+    source_model: fct_sales_features
+    keys: [date, store_nbr, item_nbr]
+    timestamp: date
+    type: categorical
+    definition: "Year extracted from date."
+    leakage_safe: true
+    in_use: true
+
+  # ---------- Item features (from dim_items) ----------
+  - name: perishable_bool
+    source_model: dim_items
+    keys: [item_nbr]
+    timestamp: null
+    type: boolean
+    definition: "TRUE if perishable=1, FALSE if 0; coalesced at gold layer."
+    leakage_safe: true
+    in_use: true
+
+  - name: family
+    source_model: dim_items
+    keys: [item_nbr]
+    timestamp: null
+    type: categorical
+    definition: "High-level product family from source."
+    leakage_safe: true
+    in_use: true
+
+  - name: class
+    source_model: dim_items
+    keys: [item_nbr]
+    timestamp: null
+    type: categorical
+    definition: "Product class (integer category) from source."
+    leakage_safe: true
+    in_use: true
+
+  # ---------- Store features (from dim_stores) ----------
+  - name: city
+    source_model: dim_stores
+    keys: [store_nbr]
+    timestamp: null
+    type: categorical
+    definition: "Store city (categorical descriptor)."
+    leakage_safe: true
+    in_use: true
+
+  - name: state
+    source_model: dim_stores
+    keys: [store_nbr]
+    timestamp: null
+    type: categorical
+    definition: "Store province/state (categorical descriptor)."
+    leakage_safe: true
+    in_use: true
+
+  - name: type
+    source_model: dim_stores
+    keys: [store_nbr]
+    timestamp: null
+    type: categorical
+    definition: "Store type code (A–E); semantics not assumed."
+    leakage_safe: true
+    in_use: true
+
+  - name: cluster
+    source_model: dim_stores
+    keys: [store_nbr]
+    timestamp: null
+    type: categorical
+    definition: "Vendor-defined grouping of similar stores."
+    leakage_safe: true
+    in_use: true
+
+  # ---------- Oil features (from dim_oil) ----------
+  - name: oil_price
+    source_model: dim_oil
+    keys: [date]
+    timestamp: date
+    type: numeric
+    definition: "Forward-filled WTI price; spine starts at first non-NULL oil date."
+    leakage_safe: true
+    in_use: true
+
+  - name: oil_price_ma7
+    source_model: dim_oil
+    keys: [date]
+    timestamp: date
+    type: numeric
+    definition: "7-day moving average of forward-filled oil price (uses only past/current days)."
+    leakage_safe: true
+    in_use: true
+
+  - name: oil_price_ma30
+    source_model: dim_oil
+    keys: [date]
+    timestamp: date
+    type: numeric
+    definition: "30-day moving average of forward-filled oil price (uses only past/current days)."
+    leakage_safe: true
+    in_use: true
+
+  - name: pct_change_1d
+    source_model: dim_oil
+    keys: [date]
+    timestamp: date
+    type: numeric
+    definition: "Day-over-day % change; computed with LAG (no future info)."
+    leakage_safe: true
+    in_use: true
+
+  - name: pct_change_7d
+    source_model: dim_oil
+    keys: [date]
+    timestamp: date
+    type: numeric
+    definition: "Week-over-week % change; computed with 7-day LAG (no future info)."
+    leakage_safe: true
+    in_use: true
+
+# Omitted-by-design (documented for future ablations)
+omitted_features:
+  - name: is_nat_holiday
+    reason: "Holiday effects deemed negligible for Flashfood perishables; left out of v1."
+    source_model: dim_holidays
+    leakage_safe: true
+    in_use: false
+
+  - name: tx_lag1
+    reason: "Transactions not available at inference; prepared offline only."
+    source_model: dim_tx_signals
+    leakage_safe: true
+    in_use: false
+
+  - name: tx_ma7_lag1
+    reason: "Transactions not available at inference; prepared offline only."
+    source_model: dim_tx_signals
+    leakage_safe: true
+    in_use: false
+
+  - name: tx_ma30_lag1
+    reason: "Transactions not available at inference; prepared offline only."
+    source_model: dim_tx_signals
+    leakage_safe: true
+    in_use: false

@@ -1,0 +1,52 @@
+version: 2
+models:
+  - name: stg_sales
+    description: "Typed passthrough of raw_native.sales"
+    columns:
+      - name: id
+        tests: [not_null]
+      - name: date
+        tests: [not_null]
+      - name: store_nbr
+        tests: [not_null]
+      - name: item_nbr
+        tests: [not_null]
+      - name: unit_sales
+        tests: [not_null]
+      # onpromotion may be NULL here (coalesce later), so no test yet
+  - name: stg_items
+    description: "Typed passthrough of raw_native.items"
+    columns:
+      - name: item_nbr
+        tests: [not_null, unique]
+      - name: perishable
+        description: "0/1 flag as ingested; may be NULL if source is messy."
+  - name: stg_stores
+    description: "Typed passthrough of raw_native.stores"
+    columns:
+      - name: store_nbr
+        tests: [not_null, unique]
+      - name: city
+        description: "City where store is located"
+      - name: state
+        description: "Province/state"
+      - name: type
+        description: "Store type (A-E), categorical"
+      - name: cluster
+        description: "Cluster grouping from source; SAFE_CAST to int"
+  - name: stg_oil_prices
+    description: "Typed passthrough of raw_native.oil_prices"
+    columns:
+      - name: date
+        tests: [not_null, unique]   
+      - name: dcoil_raw
+        description: "WTI oil price as FLOAT64 (can be NULL in raw feed)"
+  - name: stg_holidays
+    description: "Typed holidays feed with boolean transferred flag."
+    columns:
+      - name: date
+        tests: [not_null]
+      - name: type
+      - name: locale
+      - name: transferred
+        description: "TRUE if the official holiday was moved to another calendar date."

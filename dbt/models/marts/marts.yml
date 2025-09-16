@@ -1,0 +1,97 @@
+version: 2
+models:
+  - name: dim_items
+    description: "Gold item dimension with clean perishable flag."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [item_nbr]
+    columns:
+      - name: item_nbr
+        tests: [not_null]
+      - name: perishable_bool
+        tests:
+          - not_null
+          - dbt_utils.accepted_values:
+              values: [true, false]
+              quote: false
+      - name: base_price
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: "base_price > 0"
+
+  - name: dim_stores
+    description: "Gold store dimension with city, state, type, cluster."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [store_nbr]
+    columns:
+      - name: store_nbr
+        tests: [not_null]
+      - name: city
+        description: "City of the store"
+      - name: state
+        description: "Province/state of the store"
+      - name: type
+        description: "Store type (A–E), categorical; size/format proxy"
+      - name: cluster
+        description: "Cluster grouping as provided in source data"
+  - name: dim_oil_prices
+    description: "Gold oil features; one row per date."
+    columns:
+      - name: date
+        tests: [not_null, unique]
+      - name: dcoil
+        tests: [not_null]
+      - name: dcoil_ma7
+      - name: dcoil_ma30
+      - name: pct_change_1d
+      - name: pct_change_7d
+  - name: dim_holidays
+    description: "Gold national holiday feature at daily grain (celebrated day)."
+    columns:
+      - name: date
+        tests: [not_null, unique]
+      - name: is_nat_holiday
+        tests:
+          - not_null
+          - dbt_utils.accepted_values:
+              values: [true, false]
+              quote: false
+  - name: fct_sales_features
+    description: "Gold fact for periprice: clean target + calendar + items/stores/oil features."
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [date, store_nbr, item_nbr]
+    columns:
+      - name: date
+        tests: [not_null]
+      - name: store_nbr
+        tests: [not_null]
+      - name: item_nbr
+        tests: [not_null]
+      - name: unit_sales
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 200
+      - name: onpromotion
+        tests:
+          - dbt_utils.accepted_values:
+              values: [true, false]
+              quote: false
+      - name: perishable_bool
+        description: "From dim_items; TRUE for perishables."
+      - name: family
+      - name: class
+      - name: city
+      - name: state
+      - name: type
+      - name: cluster
+      - name: oil_price
+      - name: oil_price_ma7
+      - name: oil_price_ma30
+      - name: pct_change_1d
+      - name: pct_change_7d
+

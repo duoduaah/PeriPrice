@@ -1,0 +1,113 @@
+version: 2
+
+models:
+  - name: mart_features_perishable
+    description: >
+      Feature mart for perishable items with expiry- and price-driven signals.
+      Includes sales, item attributes, pricing, expiry, temporal, and external context features.
+    columns:
+      # Keys
+      - name: date
+        description: "Transaction date"
+        tests: [not_null]
+      - name: store_nbr
+        description: "Store identifier"
+        tests: [not_null]
+      - name: item_nbr
+        description: "Item identifier"
+        tests: [not_null]
+
+      # Labels
+      - name: unit_sales
+        description: "Observed unit sales (target variable)"
+        tests: [not_null]
+
+      - name: log_sales
+        description: "Log-transformed unit sales (optional alternative target)"
+        tests: []
+
+      # Item attributes
+      - name: family
+        description: "Cleaned product family (BREAD_BAKERY, DAIRY, etc.)"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['BREAD_BAKERY','DAIRY','DELI','EGGS','MEATS','POULTRY','PREPARED_FOODS','PRODUCE','SEAFOOD']
+      - name: class
+        description: "Item class (high-cardinality categorical ID)"
+        tests: [not_null]
+      - name: perishable_bool
+        description: "Whether item is perishable"
+        tests: [not_null]
+      - name: base_price
+        description: "Simulated base price per family with jitter"
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: "base_price > 0"
+
+      # Promo
+      - name: onpromotion
+        description: "Boolean promotion flag from raw sales data"
+        tests: []
+
+      # Expiry / pricing features
+      - name: shelf_life_days
+        description: "Typical shelf life in days assigned by family"
+        tests: [not_null]
+      - name: days_since_stock
+        description: "Synthetic stocking age derived from hash"
+        tests: [not_null]
+      - name: time_to_expiry
+        description: "Remaining days until expiry (>= 0)"
+        tests: [not_null]
+      - name: discount_pct
+        description: "Markdown % ladder applied based on time_to_expiry"
+        tests: [not_null]
+      - name: effective_price
+        description: "Price paid after discount (base_price * (1 - discount_pct))"
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: "effective_price >= 0"
+
+      # Temporal features
+      - name: dow
+        description: "Day of week (1 = Sunday)"
+        tests: []
+      - name: month
+        description: "Calendar month (1–12)"
+        tests: []
+      - name: year
+        description: "Calendar year"
+        tests: []
+
+      # Rolling features
+      - name: avg_units_7d
+        description: "7-day rolling avg unit sales (excludes current day)"
+        tests: []
+      - name: avg_units_14d
+        description: "14-day rolling avg unit sales (excludes current day)"
+        tests: []
+
+      # Store attributes
+      - name: city
+        description: "Store city"
+      - name: state
+        description: "Store state/region"
+      - name: type
+        description: "Store type"
+      - name: cluster
+        description: "Store cluster ID"
+
+      # External signals
+      - name: oil_price
+        description: "Daily oil price"
+      - name: oil_price_ma7
+        description: "7-day moving avg oil price"
+      - name: oil_price_ma30
+        description: "30-day moving avg oil price"
+      - name: pct_change_1d
+        description: "1-day percent change in oil price"
+      - name: pct_change_7d
+        description: "7-day percent change in oil price"

@@ -1,0 +1,15 @@
+artifact_uri: file:///home/akosua/peri-price/src/mlruns/0/0ceb09073c5441e1b2521a5874a7c087/artifacts
+end_time: 1757964341836
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+run_id: 0ceb09073c5441e1b2521a5874a7c087
+run_name: dashing-fox-137
+run_uuid: 0ceb09073c5441e1b2521a5874a7c087
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1757964316763
+status: 3
+tags: []
+user_id: akosua

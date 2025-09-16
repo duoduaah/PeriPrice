@@ -1,0 +1,66 @@
+version: 2
+models:
+  - name: int_sales
+    description: "Sales with negatives clipped, extremes capped, promo null→false, plus log_sales"
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns: [date, store_nbr, item_nbr]
+    columns:
+      - name: date
+        tests: [not_null]
+      - name: store_nbr
+        tests: [not_null]
+      - name: item_nbr
+        tests: [not_null]
+      - name: unit_sales
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 200
+      - name: onpromotion
+        tests:
+          - not_null
+          - dbt_utils.accepted_values:
+              values: [true, false]
+
+  - name: int_items
+    description: "Items with boolean perishable flag derived from 0/1."
+    columns:
+      - name: item_nbr
+        tests: [not_null, unique]
+      - name: perishable_bool
+        description: "TRUE if p erishable=1, FALSE if 0, else NULL."
+        tests:
+          - dbt_utils.expression_is_true:
+              expression: "perishable_bool IS NULL OR perishable_bool IN (TRUE, FALSE)"
+  - name: int_oil_prices
+    description: "Daily oil price with forward-fill, rolling means, and pct changes."
+    columns:
+      - name: date
+        tests: [not_null, unique]
+      - name: dcoil
+        description: "Forward-filled WTI price; no future info used."
+        tests:
+          - not_null
+      - name: dcoil_ma7
+        description: "7-day moving average; NULL for first 6 days."
+      - name: dcoil_ma30
+        description: "30-day moving average; NULL for first 29 days."
+      - name: pct_change_1d
+        description: "Day-over-day % change; NULL on first day."
+      - name: pct_change_7d
+        description: "7-day % change; NULL for first 7 days."
+  - name: int_holidays
+    description: "Date-level national holiday flag honoring 'transferred', 'bridge', and 'work day'."
+    columns:
+      - name: date
+        tests: [not_null, unique]
+      - name: is_nat_holiday
+        tests:
+          - not_null
+          - dbt_utils.accepted_values:
+              values: [true, false]
+              quote: false
+
+

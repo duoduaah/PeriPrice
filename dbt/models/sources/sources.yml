@@ -1,0 +1,11 @@
+version: 2
+sources:
+  - name: raw_native
+    schema: raw_native
+    tables:
+      - name: sales
+      - name: items
+      - name: stores
+      - name: holidays
+      - name: oil_prices
+      - name: transactions
